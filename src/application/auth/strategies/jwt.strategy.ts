@@ -11,7 +11,9 @@ type Payload = {
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
-  constructor(configService: ConfigService<EnvironmentVariables, true>) {
+  constructor(
+    private readonly configService: ConfigService<EnvironmentVariables, true>,
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,

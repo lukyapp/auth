@@ -34,12 +34,7 @@ export class AuthService implements AuthServicePort {
     }
 
     const hashedPassword = await this.passwordHasher.hash(registerDto.password);
-    const user = User.create(
-      registerDto.email,
-      registerDto.firstName,
-      registerDto.lastName,
-      hashedPassword,
-    );
+    const user = User.create(registerDto.email, hashedPassword);
 
     await this.userRepository.save(user);
     const tokens = await this.generateTokens(user.id);
@@ -57,9 +52,12 @@ export class AuthService implements AuthServicePort {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    if (!user.hashedPassword) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
     const isPasswordValid = await this.passwordHasher.compare(
       loginDto.password,
-      user.getPassword(),
+      user.hashedPassword,
     );
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');

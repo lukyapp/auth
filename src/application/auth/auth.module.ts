@@ -3,14 +3,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { EnvironmentVariables, validate } from '../../config/env.validation';
-import { JwtStrategy } from './strategies/jwt.strategy';
-import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
 import { PasswordHasherPort } from '../../domain/auth/ports/password-hasher.port';
-import { UserRepositoryPort } from '../../domain/user/ports/user.repository.port';
 import { BcryptPasswordHasherAdapter } from '../../infrastructure/crypto/bcrypt-password-hasher.adapter';
-import { UserRepository } from '../../infrastructure/persistence/user.repository';
+import { UserModule } from '../user/user.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { JwtStrategy } from './strategies/jwt.strategy';
+import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
 
 @Module({
   imports: [
@@ -30,16 +29,13 @@ import { AuthService } from './auth.service';
       }),
       inject: [ConfigService],
     }),
+    UserModule,
   ],
   controllers: [AuthController],
   providers: [
     AuthService,
     JwtStrategy,
     RefreshTokenStrategy,
-    {
-      provide: UserRepositoryPort,
-      useClass: UserRepository,
-    },
     {
       provide: PasswordHasherPort,
       useClass: BcryptPasswordHasherAdapter,
