@@ -1,19 +1,18 @@
 import {
-  Controller,
-  Post,
   Body,
-  UseGuards,
-  Get,
+  Controller,
   HttpCode,
   HttpStatus,
+  Post,
+  UseGuards,
 } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { LoginDto } from '../../domain/auth/dto/login.dto';
+import { RegisterDto } from '../../domain/auth/dto/register.dto';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { RefreshTokenGuard } from '../../common/guards/refresh-token.guard';
 import { AuthService } from './auth.service';
-import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/login.dto';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-import { RefreshTokenGuard } from '../common/guards/refresh-token.guard';
-import { CurrentUser } from '../common/decorators/current-user.decorator';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @ApiTags('auth')
 @Controller('auth')
