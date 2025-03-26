@@ -1,29 +1,25 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { SequelizeModule } from '@nestjs/sequelize';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { EnvironmentVariables } from './config/env.validation';
+import { AuthModule } from './modules/auth/auth.module';
+import { JwksModule } from './modules/jwks/jwks.module';
+import { MyJwtModule } from './modules/jwt/my-jwt.module';
+import { GoogleOauthModule } from './modules/oauth/google-oauth.module';
+import { UserModule } from './modules/user/user.module';
+import { validate } from './infrastructure/config/env.validation';
+import { DatabaseModule } from './modules/database/database.module';
 
 @Module({
   imports: [
-    SequelizeModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: async (
-        configService: ConfigService<EnvironmentVariables, true>,
-      ) => {
-        return {
-          dialect: 'postgres',
-          host: configService.get('DB_HOST'),
-          port: configService.get('DB_PORT'),
-          username: configService.get('DB_USERNAME'),
-          password: configService.get('DB_PASSWORD'),
-          database: configService.get('DB_NAME'),
-          autoLoadModels: true,
-          synchronize: true,
-        };
-      },
-      inject: [ConfigService],
+    MyJwtModule,
+    GoogleOauthModule,
+    UserModule,
+    AuthModule,
+    JwksModule,
+    DatabaseModule,
+    ConfigModule.forRoot({
+      validate,
     }),
   ],
   controllers: [AppController],
