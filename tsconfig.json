@@ -17,6 +17,8 @@
     "strictBindCallApply": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "strict": true
+    "strict": true,
+    "esModuleInterop": true, // import * as
+    "noUncheckedIndexedAccess": true, // array[0] optionnel,
   }
 }
