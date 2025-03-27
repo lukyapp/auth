@@ -19,8 +19,6 @@ async function bootstrap() {
   const GLOBAL_PREFIX = '';
   const SWAGGER_PATH = `${GLOBAL_PREFIX}/docs`;
 
-  console.log(configurationService.get('BASE_URL'));
-
   // db
 
   const sequelize: Sequelize = app.get(Sequelize);
