@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigurationModule } from '../../modules/config/configuration.module';
 import { AuthTokenServiceLocalAdapter } from '../../secondary-adapters/auth/local/auth-token.service.local-adapter';
 
 @Module({
-  imports: [ConfigModule],
+  imports: [ConfigurationModule],
   providers: [AuthTokenServiceLocalAdapter],
   exports: [AuthTokenServiceLocalAdapter],
 })

@@ -1,10 +1,9 @@
 import { Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Sequelize } from 'sequelize-typescript';
 import { AppModule } from './app.module';
-import { EnvironmentVariables } from './infrastructure/config/environment-variables';
+import { ConfigurationServicePort } from './application/config/service/configuration.service.port';
 import session from 'express-session';
 import crypto from 'crypto';
 import { Utils } from './utils/utils';
@@ -14,11 +13,13 @@ async function bootstrap() {
 
   // variables
 
-  const configService: ConfigService<EnvironmentVariables, true> =
-    app.get(ConfigService);
-  const PORT: number = configService.get('PORT');
-  const GLOBAL_PREFIX: string = '';
-  const SWAGGER_PATH: string = `${GLOBAL_PREFIX}/docs`;
+  const configurationService = app.get(ConfigurationServicePort);
+  const BASE_URL = configurationService.get('BASE_URL');
+  const PORT = configurationService.get('PORT');
+  const GLOBAL_PREFIX = '';
+  const SWAGGER_PATH = `${GLOBAL_PREFIX}/docs`;
+
+  console.log(configurationService.get('BASE_URL'));
 
   // db
 
@@ -65,17 +66,14 @@ async function bootstrap() {
 
   await app.listen(PORT);
 
-  const applicationUrl = Utils.urlJoin(
-    `http://localhost:${PORT}`,
-    GLOBAL_PREFIX,
-  );
+  const applicationUrl = Utils.urlJoin(`${BASE_URL}`, GLOBAL_PREFIX);
   const swaggerUiUrl = Utils.urlJoin(
-    `http://localhost:${PORT}`,
+    `${BASE_URL}`,
     GLOBAL_PREFIX,
     SWAGGER_PATH,
   );
   const swaggerJsonFileUrl = Utils.urlJoin(
-    `http://localhost:${PORT}`,
+    `${BASE_URL}`,
     GLOBAL_PREFIX,
     `${SWAGGER_PATH}-json`,
   );

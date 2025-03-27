@@ -1,24 +1,18 @@
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import axios from 'axios';
 import { Request } from 'express';
 import { decode, JwtPayload } from 'jsonwebtoken';
 import { passportJwtSecret } from 'jwks-rsa';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import {
-  AvailableAlgorithm,
-  EnvironmentVariables,
-} from '../../infrastructure/config/environment-variables';
+import { ConfigurationServicePort } from '../../application/config/service/configuration.service.port';
 import { Utils } from '../../utils/utils';
 
 @Injectable()
 export class JwtAuthStrategy extends PassportStrategy(Strategy, 'jwt') {
   public readonly logger = new Logger(this.constructor.name);
 
-  constructor(
-    public readonly configService: ConfigService<EnvironmentVariables, true>,
-  ) {
+  constructor(public readonly configurationService: ConfigurationServicePort) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -37,9 +31,13 @@ export class JwtAuthStrategy extends PassportStrategy(Strategy, 'jwt') {
           done(err);
         });
       },
-      algorithms: [AvailableAlgorithm.RS512],
-      audience: configService.get('JWT_AUDIENCE'),
-      issuer: configService.get('JWT_ISSUER'),
+      algorithms: configurationService.get(
+        'JWT_AUTH_STRATEGY_AUTHORIZED_ALGORITHMS',
+      ),
+      audience: configurationService.get(
+        'JWT_AUTH_STRATEGY_AUTHORIZED_AUDIENCES',
+      ),
+      issuer: configurationService.get('JWT_AUTH_STRATEGY_AUTHORIZED_ISSUERS'),
     });
   }
 
@@ -80,14 +78,6 @@ export class JwtAuthStrategy extends PassportStrategy(Strategy, 'jwt') {
       jwtAuthStrategy.logger.log('token issuer is null');
       throw new UnauthorizedException();
     }
-    const availableIssuers: string[] = [
-      jwtAuthStrategy.configService.get('JWT_ISSUER'),
-    ];
-    if (!availableIssuers.includes(issuer)) {
-      jwtAuthStrategy.logger.log('token issuer not in availableIssuers');
-      throw new UnauthorizedException();
-    }
-
     const { data } = await axios.get<{ jwks_uri?: string }>(
       Utils.urlJoin(issuer, '.well-known/openid-configuration'),
     );

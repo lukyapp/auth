@@ -4,7 +4,7 @@ import {
   JwkGeneratorPort,
   PrivateKey,
 } from '../../../application/jwks/services/jwk-generator.port';
-import { AvailableAlgorithm } from '../../config/environment-variables';
+import { AvailableAlgorithm } from '../../../domain/config/environment-variables.dto';
 
 @Injectable()
 export class JwkGeneratorJoseAdapter implements JwkGeneratorPort {

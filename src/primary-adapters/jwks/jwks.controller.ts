@@ -1,8 +1,7 @@
 import { Controller } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ConfigurationServicePort } from '../../application/config/service/configuration.service.port';
 import { GetJwksUseCase } from '../../application/jwks/use-cases/get-jwks.use-case';
-import { EnvironmentVariables } from '../../infrastructure/config/environment-variables';
 import { Utils } from '../../utils/utils';
 import { Get } from '../common/decorators/http.decorator';
 import { OpenidConfiguration } from './dtos/get-openid-configuration.response';
@@ -13,7 +12,7 @@ import { JwksResponse } from './dtos/jwks.response';
 export class JwksController {
   constructor(
     private readonly getJwksUseCase: GetJwksUseCase,
-    private readonly configService: ConfigService<EnvironmentVariables, true>,
+    private readonly configurationService: ConfigurationServicePort,
   ) {}
 
   @Get('certs')
@@ -31,7 +30,10 @@ export class JwksController {
   @ApiResponse({ status: 200, description: 'openid configuration' })
   getOpenidConfiguration() {
     return new OpenidConfiguration({
-      jwks_uri: Utils.urlJoin(this.configService.get('JWT_ISSUER'), 'certs'),
+      jwks_uri: Utils.urlJoin(
+        this.configurationService.get('JWT_ISSUER'),
+        'certs',
+      ),
     });
   }
 }

@@ -1,6 +1,6 @@
 import { JWK, KeyLike } from 'jose';
 import { Dto } from '../../../domain/common/dto';
-import { AvailableAlgorithm } from '../../../infrastructure/config/environment-variables';
+import { AvailableAlgorithm } from '../../../domain/config/environment-variables.dto';
 
 export class PrivateKey extends Dto<PrivateKey> {
   declare public readonly data: KeyLike;

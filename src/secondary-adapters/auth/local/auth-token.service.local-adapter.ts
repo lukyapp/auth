@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { UnknownElementException } from '@nestjs/core/errors/exceptions';
 import { JwtService } from '@nestjs/jwt';
 import { decodeJwt } from 'jose';
@@ -9,13 +8,13 @@ import {
   GenerateAuthTokenBody,
   GenerateAuthTokenByRefreshTokenBody,
 } from '../../../application/auth/services/auth-token.service.port';
-import { EnvironmentVariables } from '../../../infrastructure/config/environment-variables';
+import { ConfigurationServicePort } from '../../../application/config/service/configuration.service.port';
 
 @Injectable()
 export class AuthTokenServiceLocalAdapter implements AuthTokenServicePort {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService<EnvironmentVariables, true>,
+    private readonly configurationService: ConfigurationServicePort,
   ) {}
 
   async generateAuthToken({
@@ -34,7 +33,7 @@ export class AuthTokenServiceLocalAdapter implements AuthTokenServicePort {
           email,
         },
         {
-          expiresIn: this.configService.get('JWT_REFRESH_EXPIRATION'),
+          expiresIn: this.configurationService.get('JWT_REFRESH_EXPIRATION'),
         },
       );
       const { exp: refreshExpiresIn } = decodeJwt(refreshToken);

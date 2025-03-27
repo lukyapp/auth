@@ -1,122 +1,74 @@
-import { IsEnum, IsNumber, IsString, IsUrl, Max, Min } from 'class-validator';
-import {
-  AvailableAlgorithm,
-  DatabaseDialect,
-  Environment,
-  EnvironmentVariablesDto,
-  Protocol,
-} from '../../domain/config/environment-variables.dto';
-import { IsEnvArray } from '../../primary-adapters/common/validators/is-env-array.validator';
-import {
-  ExpiresIn,
-  IsExpiresIn,
-} from '../../primary-adapters/common/validators/is-expires-in.validator';
+import { ExpiresIn } from '../../primary-adapters/common/validators/is-expires-in.validator';
+import { Dto } from '../common/dto';
 
-export class EnvironmentVariables implements EnvironmentVariablesDto {
+export enum AvailableAlgorithm {
+  HS256 = 'HS256',
+  HS384 = 'HS384',
+  HS512 = 'HS512',
+  RS256 = 'RS256',
+  RS384 = 'RS384',
+  RS512 = 'RS512',
+  ES256 = 'ES256',
+  ES384 = 'ES384',
+  ES512 = 'ES512',
+  PS256 = 'PS256',
+  PS384 = 'PS384',
+  PS512 = 'PS512',
+}
+
+export enum Environment {
+  Development = 'development',
+  Production = 'production',
+  Test = 'test',
+  Preproduction = 'preproduction',
+}
+
+export enum DatabaseDialect {
+  Mysql = 'mysql',
+  Postgres = 'postgres',
+  Sqlite = 'sqlite',
+  Mariadb = 'mariadb',
+  Mssql = 'mssql',
+}
+
+export enum Protocol {
+  Http = 'http',
+  Https = 'https',
+}
+
+export class EnvironmentVariablesDto extends Dto<EnvironmentVariablesDto> {
   // ---------- SERVER ----------
-
-  @IsEnum(Environment)
   declare public readonly NODE_ENV: Environment;
-
-  @IsNumber()
-  @Min(0)
-  @Max(65535)
   declare public readonly PORT: number;
-
-  @IsEnum(Protocol)
   declare public readonly PROTOCOL: Protocol;
-
-  @IsString()
   declare public readonly HOST: string;
-
-  @IsUrl({ protocols: ['http', 'https'], require_tld: false })
   declare public readonly BASE_URL: string;
-
   // ---------- jwt auth strategy ----------
-
-  @IsEnvArray()
-  @IsUrl({ protocols: ['http', 'https'], require_tld: false }, { each: true })
   declare public readonly JWT_AUTH_STRATEGY_AUTHORIZED_AUDIENCES: string[];
-
-  @IsEnvArray()
-  @IsUrl({ protocols: ['http', 'https'], require_tld: false }, { each: true })
   declare public readonly JWT_AUTH_STRATEGY_AUTHORIZED_ISSUERS: string[];
-
-  @IsEnvArray()
-  @IsEnum(AvailableAlgorithm, { each: true })
   declare public readonly JWT_AUTH_STRATEGY_AUTHORIZED_ALGORITHMS: AvailableAlgorithm[];
-
   // ---------- JWT ----------
-
-  @IsUrl({ protocols: ['http', 'https'], require_tld: false })
   declare public readonly JWT_ISSUER: string;
-
-  @IsEnvArray()
-  @IsUrl({ protocols: ['http', 'https'], require_tld: false }, { each: true })
   declare public readonly JWT_AUDIENCES: string[];
-
-  @IsExpiresIn()
   declare public readonly JWT_ACCESS_EXPIRATION: ExpiresIn;
-
-  @IsString()
   declare public readonly JWT_REFRESH_EXPIRATION: ExpiresIn;
-
   // ---------- DB ----------
-
-  @IsString()
   declare public readonly DB_HOST: string;
-
-  @IsNumber()
-  @Min(0)
-  @Max(65535)
   declare public readonly DB_PORT: number;
-
-  @IsEnum(DatabaseDialect)
   declare public readonly DB_DIALECT: DatabaseDialect;
-
-  @IsString()
   declare public readonly DB_USERNAME: string;
-
-  @IsString()
   declare public readonly DB_PASSWORD: string;
-
-  @IsString()
   declare public readonly DB_NAME: string;
-
   // ---------- Mail ----------
-
-  @IsString()
   declare public readonly OAUTH_GOOGLE_CLIENT_ID: string;
-
-  @IsString()
   declare public readonly OAUTH_GOOGLE_CLIENT_SECRET: string;
-
   // ---------- Mail ----------
-
-  @IsString()
   declare public readonly MAIL_HOST: string;
-
-  @IsNumber()
-  @Min(0)
-  @Max(65535)
   declare public readonly MAIL_PORT: number;
-
-  @IsString()
   declare public readonly MAIL_USER: string;
-
-  @IsString()
   declare public readonly MAIL_PASSWORD: string;
-
-  @IsString()
   declare public readonly MAIL_FROM: string;
-
   // ---------- Redis ----------
-
-  @IsString()
   declare public readonly REDIS_HOST: string;
-
-  @IsNumber()
-  @Min(0)
-  @Max(65535)
   declare public readonly REDIS_PORT: number;
 }

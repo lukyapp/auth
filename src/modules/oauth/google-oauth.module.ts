@@ -1,29 +1,29 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigurationServicePort } from '../../application/config/service/configuration.service.port';
 import { GoogleOauthConfig } from '../../application/oauth/google/google-oauth.config';
-import { EnvironmentVariables } from '../../infrastructure/config/environment-variables';
 import { GoogleOauthController } from '../../primary-adapters/oauth/google/google-oauth.controller';
 import { GoogleOAuthGuard } from '../../primary-adapters/oauth/google/google-oauth.guard';
 import { GoogleOauthStrategy } from '../../primary-adapters/oauth/google/google-oauth.strategy';
+import { Utils } from '../../utils/utils';
 import { AuthModule } from '../auth/auth.module';
+import { ConfigurationModule } from '../config/configuration.module';
 
 @Module({
   controllers: [GoogleOauthController],
-  imports: [AuthModule, ConfigModule],
+  imports: [AuthModule, ConfigurationModule],
   providers: [
     GoogleOauthStrategy,
     GoogleOAuthGuard,
     {
       provide: GoogleOauthConfig,
-      inject: [ConfigService],
-      useFactory: (
-        configService: ConfigService<EnvironmentVariables, true>,
-      ) => {
+      inject: [ConfigurationServicePort],
+      useFactory: (configurationService: ConfigurationServicePort) => {
+        const baseUrl = configurationService.get('BASE_URL');
         return new GoogleOauthConfig({
-          clientID: configService.get('OAUTH_GOOGLE_CLIENT_ID'),
-          clientSecret: configService.get('OAUTH_GOOGLE_CLIENT_SECRET'),
-          callbackURL: 'http://localhost:3000/auth/google/callback',
-          successURL: 'http://localhost:3000/auth/google/success',
+          clientID: configurationService.get('OAUTH_GOOGLE_CLIENT_ID'),
+          clientSecret: configurationService.get('OAUTH_GOOGLE_CLIENT_SECRET'),
+          callbackURL: Utils.urlJoin(baseUrl, '/auth/google/callback'),
+          successURL: Utils.urlJoin(baseUrl, '/auth/google/success'),
         });
       },
     },

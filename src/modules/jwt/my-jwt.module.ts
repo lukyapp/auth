@@ -1,25 +1,25 @@
 import { InternalServerErrorException, Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule, JwtModuleOptions, JwtSecretRequestType } from '@nestjs/jwt';
+import { ConfigurationServicePort } from '../../application/config/service/configuration.service.port';
 import { JwkGeneratorPort } from '../../application/jwks/services/jwk-generator.port';
 import { PrivateKeyToStringConverterPort } from '../../application/jwks/services/private-key-to-string.converter.port';
 import { PublicKeyGetter } from '../../application/jwks/services/public-key.getter.port';
-import { EnvironmentVariables } from '../../infrastructure/config/environment-variables';
+import { ConfigurationModule } from '../config/configuration.module';
 import { JwksModule } from '../jwks/jwks.module';
 
 @Module({
   imports: [
     JwtModule.registerAsync({
       global: true,
-      imports: [ConfigModule, JwksModule],
+      imports: [ConfigurationModule, JwksModule],
       inject: [
-        ConfigService,
+        ConfigurationServicePort,
         JwkGeneratorPort,
         PrivateKeyToStringConverterPort,
         PublicKeyGetter,
       ],
       useFactory: async (
-        configService: ConfigService<EnvironmentVariables, true>,
+        configurationService: ConfigurationServicePort,
         jwkGenerator: JwkGeneratorPort,
         jwkToPemConverter: PrivateKeyToStringConverterPort,
         publicKeyGetter: PublicKeyGetter,
@@ -55,16 +55,22 @@ import { JwksModule } from '../jwks/jwks.module';
         return {
           secretOrKeyProvider,
           signOptions: {
-            expiresIn: configService.get('JWT_ACCESS_EXPIRATION'),
-            issuer: configService.get('JWT_ISSUER'),
-            audience: configService.get('JWT_AUDIENCE'),
+            expiresIn: configurationService.get('JWT_ACCESS_EXPIRATION'),
+            issuer: configurationService.get('JWT_ISSUER'),
+            audience: configurationService.get('JWT_AUDIENCES'),
             algorithm,
             keyid: privateKey.kid,
           },
           verifyOptions: {
-            algorithms: [algorithm],
-            audience: configService.get('JWT_AUDIENCE'),
-            issuer: configService.get('JWT_ISSUER'),
+            algorithms: configurationService.get(
+              'JWT_AUTH_STRATEGY_AUTHORIZED_ALGORITHMS',
+            ),
+            audience: configurationService.get(
+              'JWT_AUTH_STRATEGY_AUTHORIZED_AUDIENCES',
+            ),
+            issuer: configurationService.get(
+              'JWT_AUTH_STRATEGY_AUTHORIZED_ISSUERS',
+            ),
             ignoreExpiration: false,
           },
         };

@@ -1,28 +1,26 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { EnvironmentVariables } from '../../infrastructure/config/environment-variables';
+import { ConfigurationServicePort } from '../../application/config/service/configuration.service.port';
 import { UserSequelizeModel } from '../../secondary-adapters/user/sequelize/user.sequlize-model';
+import { ConfigurationModule } from '../config/configuration.module';
 
 @Module({
   imports: [
     SequelizeModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (
-        configService: ConfigService<EnvironmentVariables, true>,
-      ) => {
+      imports: [ConfigurationModule],
+      useFactory: (configurationService: ConfigurationServicePort) => {
         return {
-          dialect: configService.get('DB_DIALECT'),
-          host: configService.get('DB_HOST'),
-          port: configService.get('DB_PORT'),
-          username: configService.get('DB_USERNAME'),
-          password: configService.get('DB_PASSWORD'),
-          database: configService.get('DB_NAME'),
+          dialect: configurationService.get('DB_DIALECT'),
+          host: configurationService.get('DB_HOST'),
+          port: configurationService.get('DB_PORT'),
+          username: configurationService.get('DB_USERNAME'),
+          password: configurationService.get('DB_PASSWORD'),
+          database: configurationService.get('DB_NAME'),
           logging: console.log,
           models: [UserSequelizeModel],
         };
       },
-      inject: [ConfigService],
+      inject: [ConfigurationServicePort],
     }),
   ],
   exports: [SequelizeModule],
