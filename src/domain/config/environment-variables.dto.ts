@@ -31,11 +31,6 @@ export enum DatabaseDialect {
   Mssql = 'mssql',
 }
 
-export enum Protocol {
-  Http = 'http',
-  Https = 'https',
-}
-
 export class EnvironmentVariablesDto extends Dto<EnvironmentVariablesDto> {
   // ---------- SERVER ----------
   declare public readonly NODE_ENV: Environment;

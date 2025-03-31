@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import { ClassSerializerInterceptor, Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Sequelize } from 'sequelize-typescript';
@@ -18,6 +18,12 @@ async function bootstrap() {
   const PORT = configurationService.get('PORT');
   const GLOBAL_PREFIX = '';
   const SWAGGER_PATH = `${GLOBAL_PREFIX}/docs`;
+
+  //
+  const classSerializerInterceptor = app.get(ClassSerializerInterceptor);
+  const validationPipe = app.get(ValidationPipe);
+  app.useGlobalInterceptors(classSerializerInterceptor);
+  app.useGlobalPipes(validationPipe);
 
   // db
 
