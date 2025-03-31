@@ -100,7 +100,6 @@ export class UserRepositoryKeycloakAdapter implements UserRepositoryPort {
         email: email,
       });
     } catch (error) {
-      console.log(error);
       if (error instanceof AxiosError) {
         console.log({
           name: error.name,

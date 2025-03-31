@@ -4,12 +4,12 @@ import { Dto } from '../../../domain/common/dto';
 
 export class AuthenticateUserResponseData extends Dto<AuthenticateUserResponseData> {
   @Expose()
-  declare userId: string;
+  declare public readonly userId: string;
 
   @Expose()
-  declare accessToken: string;
+  declare public readonly accessToken: string;
 
   @Expose()
   @IsOptional()
-  declare refreshToken?: string;
+  declare public readonly refreshToken?: string;
 }

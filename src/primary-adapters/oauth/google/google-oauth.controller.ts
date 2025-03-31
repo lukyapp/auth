@@ -1,6 +1,6 @@
-import { Controller, Query, Req, Res, UseGuards } from '@nestjs/common';
+import { Controller, Headers, Query, Res, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { AuthenticatorOauthStrategy } from '../../../application/auth/services/authenticator/authenticator.oauth-strategy';
 import { AuthenticateUseCase } from '../../../application/auth/use-cases/authenticate.use-case';
 import { OauthValidateResult } from '../../../application/oauth/beans/oauth-validate-result.dto';
@@ -24,21 +24,34 @@ export class GoogleOauthController extends OauthControllerI<GoogleOauthConfig> {
 
   @Get('authorize')
   @UseGuards(GoogleOAuthGuard)
-  authorize(@Req() req: Request): void | Promise<void> {
-    console.log(req.url);
-  }
+  authorize(): void | Promise<void> {}
 
   @Get('callback')
   @UseGuards(GoogleOAuthGuard)
   async callback(
     @CurrentUser() { profile }: OauthValidateResult,
     @Res() response: Response,
+    @Headers('user-agent') userAgent: string,
   ): Promise<void> {
+    const isMobile = /mobile|android|iphone|ipad|ipod/i.test(userAgent);
     const authenticateUserResponseData = await this.authenticateUseCase.perform(
       this.authenticatorOauthStrategy,
       profile,
     );
-    response.redirect(this.buildSuccessUrl(authenticateUserResponseData));
+
+    if (!isMobile) {
+      response.redirect(this.buildSuccessUrl(authenticateUserResponseData));
+      return;
+    }
+
+    const { userId, accessToken, refreshToken } = authenticateUserResponseData;
+    const url = new URL('besafe://auth-callback');
+    url.searchParams.append('userId', userId);
+    url.searchParams.append('accessToken', accessToken);
+    if (refreshToken) {
+      url.searchParams.append('refreshToken', refreshToken);
+    }
+    response.redirect(url.toString());
   }
 
   @Get('success')

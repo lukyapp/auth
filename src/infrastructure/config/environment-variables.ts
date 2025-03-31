@@ -4,7 +4,6 @@ import {
   DatabaseDialect,
   Environment,
   EnvironmentVariablesDto,
-  Protocol,
 } from '../../domain/config/environment-variables.dto';
 import { IsEnvArray } from '../../primary-adapters/common/validators/is-env-array.validator';
 import {
@@ -22,12 +21,6 @@ export class EnvironmentVariables implements EnvironmentVariablesDto {
   @Min(0)
   @Max(65535)
   declare public readonly PORT: number;
-
-  @IsEnum(Protocol)
-  declare public readonly PROTOCOL: Protocol;
-
-  @IsString()
-  declare public readonly HOST: string;
 
   @IsUrl({ protocols: ['http', 'https'], require_tld: false })
   declare public readonly BASE_URL: string;

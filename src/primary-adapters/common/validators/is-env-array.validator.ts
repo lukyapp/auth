@@ -8,7 +8,12 @@ export function IsEnvArray() {
     ArrayNotEmpty(),
     IsString({ each: true }),
     Transform(({ value }: { value: unknown }) =>
-      typeof value === 'string' ? value.split(',').filter(value => value!=='').map((v) => v.trim()) : value,
+      typeof value === 'string'
+        ? value
+            .split(',')
+            .filter((value) => value !== '')
+            .map((v) => v.trim())
+        : value,
     ),
   );
 }

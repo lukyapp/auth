@@ -40,8 +40,6 @@ export class EnvironmentVariablesDto extends Dto<EnvironmentVariablesDto> {
   // ---------- SERVER ----------
   declare public readonly NODE_ENV: Environment;
   declare public readonly PORT: number;
-  declare public readonly PROTOCOL: Protocol;
-  declare public readonly HOST: string;
   declare public readonly BASE_URL: string;
   // ---------- jwt auth strategy ----------
   declare public readonly JWT_AUTH_STRATEGY_AUTHORIZED_AUDIENCES: string[];

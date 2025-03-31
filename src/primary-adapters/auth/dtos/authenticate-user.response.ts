@@ -6,5 +6,5 @@ import { ResponseGetOne } from '../../common/dtos/response-get-one.dto';
 export class AuthenticateUserResponse extends ResponseGetOne<AuthenticateUserResponseData> {
   @Expose()
   @Nested(() => AuthenticateUserResponseData)
-  declare data: AuthenticateUserResponseData;
+  declare public readonly data: AuthenticateUserResponseData;
 }
